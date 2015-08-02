@@ -1,0 +1,30 @@
+{
+  "name": "generator-project-journal",
+  "version": "0.0.0",
+  "description": "A Yeoman generator to make a journal-styled Jekyll blog.",
+  "license": "MIT",
+  "main": "app/index.js",
+  "repository": "diagramatics/generator-project-journal",
+  "author": {
+    "name": "Steven Sinatra",
+    "email": "ohai@diagramatics.me",
+    "url": "https://github.com/diagramatics"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "files": [
+    "generators"
+  ],
+  "keywords": [
+    "yeoman-generator"
+  ],
+  "dependencies": {
+    "yeoman-generator": "^0.19.0",
+    "chalk": "^1.0.0",
+    "yosay": "^1.0.2"
+  },
+  "devDependencies": {
+    "mocha": "*"
+  }
+}

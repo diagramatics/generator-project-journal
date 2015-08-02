@@ -1,0 +1,80 @@
+---
+# Only the main Sass file needs front matter (the dashes are enough)
+---
+@charset "utf-8";
+
+
+
+// Our variables
+$base-font-family: "Roboto Mono", "Consolas", monospace;
+$base-font-size:   16px;
+$base-font-weight: 300;
+$small-font-size:  $base-font-size * 0.875;
+$base-line-height: 1.5;
+
+$spacing-unit:     30px;
+
+<% if (props.theme === 'light') { %>
+$text-color:       #333;
+$background-color: #fdfdfd;
+<% } else { %>
+$text-color:       #fdfdfd;
+$background-color: #333;
+<% } %>
+
+$brand-color:      <%= props.color %>;
+
+$grey-color:       #828282;
+$grey-color-light: lighten($grey-color, 43%);
+$grey-color-dark:  darken($grey-color, 25%);
+
+// Width of the content area
+$content-width:    800px;
+
+$on-palm:          600px;
+$on-laptop:        800px;
+$on-small-mobile:  400px;
+
+
+
+// Using media queries with like this:
+// @include media-query($on-palm) {
+//     .wrapper {
+//         padding-right: $spacing-unit / 2;
+//         padding-left: $spacing-unit / 2;
+//     }
+// }
+@mixin media-query($device) {
+    @media screen and (max-width: $device) {
+        @content;
+    }
+}
+
+@mixin magic-underline() {
+  text-decoration: none;
+  background-image: linear-gradient(to bottom, transparent 50%, currentColor 50%);
+  background-repeat: repeat-x;
+  background-size: 2px 2px;
+  background-position: 0 1.125em;
+  text-shadow: .03em 0 $background-color,
+               -.03em 0 $background-color,
+               0 .03em $background-color,
+               0 -.03em $background-color,
+               .06em 0 $background-color,
+               -.06em 0 $background-color,
+               .09em 0 $background-color,
+               -.09em 0 $background-color,
+               .12em 0 $background-color,
+               -.12em 0 $background-color,
+               .15em 0 $background-color,
+               -.15em 0 $background-color
+}
+
+
+
+// Import partials from `sass_dir` (defaults to `_sass`)
+@import
+        "base",
+        "layout",
+        "syntax-highlighting"
+;
