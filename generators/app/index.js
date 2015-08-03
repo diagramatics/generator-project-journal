@@ -12,7 +12,7 @@ module.exports = yeoman.generators.Base.extend({
     this.option('skip-install');
 
     // Get the saved configuration if there's any
-    var savedConfig = this.storage ? this.storage.getAll() : {};
+    var savedConfig = this.config ? this.config.getAll() : {};
 
     var isGitInitialized = function() {
       try {
@@ -28,6 +28,10 @@ module.exports = yeoman.generators.Base.extend({
     this.log(yosay(
       'Welcome to the priceless ' + chalk.red('ProjectJournal') + ' generator!'
     ));
+
+    if (savedConfig !== {}) {
+      this.log('We found a preexisting configuration. Using that as the default values now.');
+    }
 
     var prompts = [{
       type: 'input',
@@ -180,6 +184,14 @@ module.exports = yeoman.generators.Base.extend({
         return !isGitInitialized();
       },
       type: 'confirm',
+      name: 'git',
+      message: 'Initialize GitHub and set gh-pages as default branch?',
+      default: true
+    }, {
+      when: function() {
+        return !isGitInitialized();
+      },
+      type: 'confirm',
       name: 'deploy',
       message: 'Immediately deploy to GitHub after this?',
       default: true
@@ -277,7 +289,7 @@ module.exports = yeoman.generators.Base.extend({
       this.spawnCommand('bundle', ['install']);
     }
 
-    if (this.props.deploy) {
+    if (this.props.git) {
       this.log('Setting up '+ chalk.yellow('Git') +' and immediately deploying...');
       // TODO: yay async callback hell
       this.spawnCommand('git', ['init']).on('close', function() {
@@ -286,10 +298,19 @@ module.exports = yeoman.generators.Base.extend({
             this.spawnCommand('git', ['add', '-A']).on('close', function() {
               this.spawnCommand('git', ['commit', '-m', '"Initial commit"']).on('close', function() {
                 this.spawnCommand('git', ['remote', 'add', 'origin', 'https://github.com/' + this.props.githubPages + '.git']).on('close', function() {
-                  this.spawnCommand('git', ['push', '-u', 'origin', 'gh-pages']).on('close', function() {
-                    this.log('Git setup '+ chalk.green('finished') +'. Refer to the errors to see if remote pushing was successful.');
+                  this.log('\nGit initialization '+ chalk.green('finished') +'.');
+
+                  if (this.props.deploy) {
+                    this.log('Pushing branch to GitHub...');
+                    this.spawnCommand('git', ['push', '-u', 'origin', 'gh-pages']).on('close', function() {
+                      this.log('\nGit deployment '+ chalk.green('finished') +'. Refer to the errors to see if remote pushing was successful.');
+                      done();
+                    }.bind(this));
+                  }
+                  else {
+                    this.log('You can run '+ chalk.blue('git push -u origin gh-pages') +' when you\'re ready to push your code to GitHub and make it live.');
                     done();
-                  }.bind(this));
+                  }
                 }.bind(this));
               }.bind(this));
             }.bind(this));
@@ -297,10 +318,13 @@ module.exports = yeoman.generators.Base.extend({
         }.bind(this));
       }.bind(this));
     }
+    else {
+      done();
+    }
   },
 
   end: function () {
-    this.log(chalk.green('We\'re done!'));
+    this.log(chalk.green('\nWe\'re done!'));
     this.log('You can run '+ chalk.blue('yo project-journal:post') +' to scaffold a blog post entry too.');
     this.log('Thank you for using generator-project-journal!');
   }
