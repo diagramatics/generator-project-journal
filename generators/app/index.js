@@ -17,7 +17,7 @@ module.exports = yeoman.generators.Base.extend({
         return false;
       }
       return true;
-    }
+    };
 
     // Have Yeoman greet the user.
     this.log(yosay(
