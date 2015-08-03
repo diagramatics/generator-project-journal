@@ -21,13 +21,12 @@ module.exports = yeoman.generators.Base.extend({
     }, {
       type: 'input',
       name: 'date',
-      message: 'Date (yyyy-mm-dd [HH:mm:ss [+- HHmm]]):',
-      default: moment().format('YYYY-MM-DD HH:mm:ss ZZ'),
+      message: 'Date (yyyy-mm-dd [HH:mm:ss]):',
+      default: moment().format('YYYY-MM-DD HH:mm:ss'),
       validate: function(input) {
         // Check for input based on the available format
         if (moment(input, 'YYYY-MM-DD', true).isValid() ||
-        moment(input, 'YYYY-MM-DD HH:mm:ss', true).isValid() ||
-        moment(input, 'YYYY-MM-DD HH:mm:ss ZZ', true).isValid()) {
+        moment(input, 'YYYY-MM-DD HH:mm:ss', true).isValid()) {
           return true;
         }
 
@@ -41,7 +40,7 @@ module.exports = yeoman.generators.Base.extend({
 
     this.prompt(prompts, function (props) {
       // Use the best format for the date
-      props.date = moment(props.date, 'YYYY-MM-DD HH:mm:ss ZZ').format('YYYY-MM-DD HH:mm:ss ZZ');
+      props.date = moment(props.date, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
 
       this.props = props;
       // To access props later use this.props.someOption;
