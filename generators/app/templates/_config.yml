@@ -11,7 +11,7 @@ url: "<%= props.url %>" # the base hostname & protocol for your site
 twitter_username: <%= props.twitter %>
 <% } %>
 <% if (props.repo) { %>
-github_project:  <%= props.repo %>
+github_project: <%= props.repo %>
 <% } %>
 
 # Build settings
