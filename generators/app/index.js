@@ -11,6 +11,9 @@ module.exports = yeoman.generators.Base.extend({
 
     this.option('skip-install');
 
+    // Get the saved configuration if there's any
+    var savedConfig = this.storage ? this.storage.getAll() : {};
+
     var isGitInitialized = function() {
       try {
         fs.accessSync('.git');
@@ -30,34 +33,33 @@ module.exports = yeoman.generators.Base.extend({
       type: 'input',
       name: 'projectName',
       message: 'Your project name:',
-      default: this.appname,
-      store: true
+      default: savedConfig.projectName || this.appname
     }, {
       type: 'input',
       name: 'description',
       message: 'A description of your project:',
-      default: 'This is a cool project!',
-      store: true
+      default: savedConfig.description || 'This is a cool project!'
     }, {
       type: 'input',
       name: 'email',
       message: 'Your project contact email (empty for none):',
-      store: true
+      default: savedConfig.email || undefined
     }, {
       type: 'input',
       name: 'twitter',
       message: 'Your Twitter handle (without the @, can be blank):',
+      default: savedConfig.twitter || undefined,
       validate: function(input) {
         if (input.charAt[0] === '@') {
           return 'No need for the @ in the beginning.';
         }
         return true;
-      },
-      store: true
+      }
     }, {
       type: 'input',
       name: 'repo',
       message: 'Your project GitHub organization or specific repo (repo/username format) (empty for none):',
+      default: savedConfig.repo || undefined,
       validate: function(input) {
         if (input.substr(0, 4) === 'http' || input.substr(0, 6) === 'github') {
           return 'No need to pass in the GitHub URL. Just pass in your organization name or use the '+ chalk.red('username') +'/'+ chalk.blue('repo') +' format.';
@@ -69,12 +71,12 @@ module.exports = yeoman.generators.Base.extend({
           return true;
         }
         return 'The repo has to match the '+ chalk.red('username') +'/'+ chalk.blue('repo') +' format.';
-      },
-      store: true
+      }
     }, {
       type: 'input',
       name: 'githubPages',
       message: 'The GitHub repo where this journal is published on (username/repo):',
+      default: savedConfig.githubPages || undefined,
       validate: function(input) {
         var re = /^\w+\/\w+$/g; // (username/repo)
         if (input.match(re)) {
@@ -84,14 +86,12 @@ module.exports = yeoman.generators.Base.extend({
           return 'No need to pass in the GitHub URL. Just use the '+ chalk.red('username') +'/'+ chalk.blue('repo') +' format.';
         }
         return 'The repo has to match the '+ chalk.red('username') +'/'+ chalk.blue('repo') +' format.';
-      },
-      store: true
+      }
     }, {
       type: 'confirm',
       name: 'customDomain',
       message: 'Use custom domain? (if not we\'re going to use GitHub Pages\' default URL)',
-      default: false,
-      store: true
+      default: savedConfig.customDomain || false
     }, {
       when: function(response) {
         return response.customDomain;
@@ -99,6 +99,7 @@ module.exports = yeoman.generators.Base.extend({
       type: 'input',
       name: 'url',
       message: 'Website protocol and URL ('+ chalk.green('http://website.domain') +'/path/):',
+      default: savedConfig.url || undefined,
       validate: function(input) {
         var re = /^http[s]?:\/\/[A-Za-z0-9_.]+[A-Za-z0-9_]+$/i;
         if (input.match(re)) {
@@ -115,8 +116,7 @@ module.exports = yeoman.generators.Base.extend({
             return 'That doesn\'t seem like a valid format.';
           }
         }
-      },
-      store: true
+      }
     }, {
       when: function(response) {
         return response.customDomain;
@@ -124,17 +124,18 @@ module.exports = yeoman.generators.Base.extend({
       type: 'input',
       name: 'basePath',
       message: 'Website base path (you can leave it empty too) (http://website.domain'+ chalk.green('/path') +'/):',
+      default: savedConfig.basePath || null,
       validate: function(input) {
         if (input.charAt(0) !== '/') {
           return 'You need a slash (/) in the beginning of the path.';
         }
         return true;
-      },
-      store: true
+      }
     }, {
       type: 'input',
       name: 'disqus',
       message: 'Your Disqus shortname for comments (subdomain) (Register: https://disqus.com/admin/create/):',
+      default: savedConfig.disqus || null,
       validate: function(input) {
         var re = /^[A-Za-z0-9-]+$/g;
         if (input.match(re)) {
@@ -143,8 +144,7 @@ module.exports = yeoman.generators.Base.extend({
         else {
           return 'Use only the Disqus shortname, for example '+ chalk.blue('shortname') +'.disqus.com';
         }
-      },
-      store: true
+      }
     }, {
       type: 'list',
       name: 'theme',
@@ -159,13 +159,12 @@ module.exports = yeoman.generators.Base.extend({
           value: 'Dark'
         }
       ],
-      default: 'light',
-      store: true
+      default: savedConfig.theme || 'light'
     }, {
       type: 'input',
       name: 'color',
       message: 'Your primary color (#hex):',
-      default: '#2a7ae2',
+      default: savedConfig.color || '#2a7ae2',
       validate: function(input) {
         var re = /^#[a-f0-9]{3,6}$/i;
         if (input.match(re)) {
@@ -175,8 +174,7 @@ module.exports = yeoman.generators.Base.extend({
           return 'You have to include a # in the beginning';
         }
         return 'That doesn\'t look like a hex string.';
-      },
-      store: true
+      }
     }, {
       when: function() {
         return !isGitInitialized();
@@ -215,6 +213,23 @@ module.exports = yeoman.generators.Base.extend({
 
     editorconfig: function() {
       this.copy('editorconfig', '.editorconfig');
+    },
+
+    yeomanConfig: function() {
+      // Save the configuration to a yo-rc.json folder
+      this.config.set('projectName', this.props.projectName);
+      this.config.set('description', this.props.description);
+      this.config.set('email', this.props.email);
+      this.config.set('twitter', this.props.twitter);
+      this.config.set('repo', this.props.repo);
+      this.config.set('githubPages', this.props.githubPages);
+      this.config.set('customDomain', this.props.customDomain);
+      this.config.set('url', this.props.url);
+      this.config.set('basePath', this.props.basePath);
+      this.config.set('disqus', this.props.disqus);
+      this.config.set('theme', this.props.theme);
+      this.config.set('color', this.props.color);
+      this.config.save();
     }
   },
 
