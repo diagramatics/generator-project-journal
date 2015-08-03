@@ -9,6 +9,8 @@ module.exports = yeoman.generators.Base.extend({
   prompting: function () {
     var done = this.async();
 
+    this.option('skip-install');
+
     var isGitInitialized = function() {
       try {
         fs.accessSync('.git');
@@ -254,8 +256,11 @@ module.exports = yeoman.generators.Base.extend({
   install: function () {
     var done = this.async();
 
-    this.log('Running '+ chalk.yellow('bundle install') +'...');
-    this.spawnCommand('bundle', ['install']);
+    // Skip bundle install with the option
+    if (!this.options.skipInstall) {
+      this.log('Running '+ chalk.yellow('bundle install') +'...');
+      this.spawnCommand('bundle', ['install']);
+    }
 
     if (this.props.deploy) {
       this.log('Setting up '+ chalk.yellow('Git') +' and immediately deploying...');
