@@ -3,6 +3,7 @@ var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 var yosay = require('yosay');
 var fs = require('fs');
+var moment = require('moment');
 
 module.exports = yeoman.generators.Base.extend({
   prompting: function () {
@@ -238,7 +239,9 @@ module.exports = yeoman.generators.Base.extend({
     },
 
     posts: function() {
-      this.directory('_posts');
+      this.template('_posts/welcome-to-jekyll.md', '_posts/' + moment().format('YYYY-mm-DD') + '-welcome-to-jekyll.md', {
+        date: moment().format('YYYY-MM-DD HH:mm:ss ZZ')
+      });
     },
 
     others: function() {
