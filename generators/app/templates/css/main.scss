@@ -28,6 +28,15 @@ $grey-color:       #828282;
 $grey-color-light: lighten($grey-color, 43%);
 $grey-color-dark:  darken($grey-color, 25%);
 
+// These colors are relative to the page main background color
+<% if (props.theme === 'light') { %>
+$grey-color-strong: $grey-color-dark;
+$grey-color-weak: $grey-color-light;
+<% } else { %>
+$grey-color-strong: $grey-color-light;
+$grey-color-weak: $grey-color-dark;
+<% } %>
+
 // Width of the content area
 $content-width:    800px;
 

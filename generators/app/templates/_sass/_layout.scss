@@ -3,7 +3,7 @@
 */
 .site-header {
   margin: 0 5em;
-  border-bottom: 1px solid $grey-color-light;
+  border-bottom: 1px solid $grey-color-weak;
   min-height: 56px;
 
   @include media-query($on-small-mobile) {
@@ -21,7 +21,7 @@
 
   &,
   &:visited {
-    color: $grey-color-dark;
+    color: $grey-color-strong;
   }
 
   @include media-query($on-palm) {
@@ -80,8 +80,8 @@
     }
 
     &:hover {
-      background: $grey-color-dark;
-      color: $grey-color-light;
+      background: $grey-color-strong;
+      color: $grey-color-weak;
     }
 
     &:hover .trigger {
@@ -106,7 +106,7 @@
 * Site footer
 */
 .site-footer {
-  border-top: 1px solid $grey-color-light;
+  border-top: 1px solid $grey-color-weak;
   padding: $spacing-unit 0;
 }
 
@@ -245,7 +245,7 @@
 // Comments
 
 .comments {
-  border-top: thin solid $grey-color-light;
+  border-top: thin solid $grey-color-weak;
   margin-top: 8em;
   padding-top: 3em;
 }
