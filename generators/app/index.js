@@ -268,8 +268,8 @@ module.exports = yeoman.generators.Base.extend({
     },
 
     posts: function() {
-      this.template('_posts/welcome-to-jekyll.md', '_posts/' + moment().format('YYYY-mm-DD') + '-welcome-to-jekyll.md', {
-        date: moment().format('YYYY-MM-DD HH:mm:ss ZZ')
+      this.template('_posts/welcome-to-jekyll.md', '_posts/' + moment().format('YYYY-MM-DD') + '-welcome-to-jekyll.md', {
+        date: moment().format('YYYY-MM-DD HH:mm:ss')
       });
     },
 
