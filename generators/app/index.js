@@ -114,7 +114,7 @@ module.exports = yeoman.generators.Base.extend({
             return 'No need for a slash in the end.';
           }
           else if (!input.match(/^http[s]/i)) {
-              return 'Include the protocol (http(s)://) in the beginning.';
+            return 'Include the protocol (http(s)://) in the beginning.';
           }
           else {
             return 'That doesn\'t seem like a valid format.';
@@ -295,23 +295,21 @@ module.exports = yeoman.generators.Base.extend({
       this.spawnCommand('git', ['init']).on('close', function() {
         this.spawnCommand('git', ['checkout', '-b', 'gh-pages']).on('close', function() {
           this.spawnCommand('git', ['add', '-A']).on('close', function() {
-            this.spawnCommand('git', ['add', '-A']).on('close', function() {
-              this.spawnCommand('git', ['commit', '-m', '"Initial commit"']).on('close', function() {
-                this.spawnCommand('git', ['remote', 'add', 'origin', 'https://github.com/' + this.props.githubPages + '.git']).on('close', function() {
-                  this.log('\nGit initialization '+ chalk.green('finished') +'.');
+            this.spawnCommand('git', ['commit', '-m', '"Initial commit"']).on('close', function() {
+              this.spawnCommand('git', ['remote', 'add', 'origin', 'https://github.com/' + this.props.githubPages + '.git']).on('close', function() {
+                this.log('\nGit initialization '+ chalk.green('finished') +'.');
 
-                  if (this.props.deploy) {
-                    this.log('Pushing branch to GitHub...');
-                    this.spawnCommand('git', ['push', '-u', 'origin', 'gh-pages']).on('close', function() {
-                      this.log('\nGit deployment '+ chalk.green('finished') +'. Refer to the errors to see if remote pushing was successful.');
-                      done();
-                    }.bind(this));
-                  }
-                  else {
-                    this.log('You can run '+ chalk.blue('git push -u origin gh-pages') +' when you\'re ready to push your code to GitHub and make it live.');
+                if (this.props.deploy) {
+                  this.log('Pushing branch to GitHub...');
+                  this.spawnCommand('git', ['push', '-u', 'origin', 'gh-pages']).on('close', function() {
+                    this.log('\nGit deployment '+ chalk.green('finished') +'. Refer to the errors to see if remote pushing was successful.');
                     done();
-                  }
-                }.bind(this));
+                  }.bind(this));
+                }
+                else {
+                  this.log('You can run '+ chalk.blue('git push -u origin gh-pages') +' when you\'re ready to push your code to GitHub and make it live.');
+                  done();
+                }
               }.bind(this));
             }.bind(this));
           }.bind(this));
