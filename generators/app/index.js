@@ -54,7 +54,7 @@ module.exports = yeoman.generators.Base.extend({
       message: 'Your Twitter handle (without the @, can be blank):',
       default: savedConfig.twitter || undefined,
       validate: function(input) {
-        if (input.charAt[0] === '@') {
+        if (input.charAt(0) === '@') {
           return 'No need for the @ in the beginning.';
         }
         return true;
