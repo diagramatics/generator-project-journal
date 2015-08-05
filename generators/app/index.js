@@ -4,6 +4,7 @@ var chalk = require('chalk');
 var yosay = require('yosay');
 var fs = require('fs');
 var moment = require('moment');
+var async = require('async');
 
 module.exports = yeoman.generators.Base.extend({
   prompting: function () {
@@ -220,7 +221,6 @@ module.exports = yeoman.generators.Base.extend({
 
     gemfile: function() {
       this.copy('Gemfile');
-      this.copy('Gemfile.lock');
     },
 
     editorconfig: function() {
@@ -283,42 +283,73 @@ module.exports = yeoman.generators.Base.extend({
   install: function () {
     var done = this.async();
 
-    // Skip bundle install with the option
-    if (!this.options.skipInstall) {
-      this.log('Running '+ chalk.yellow('bundle install') +'...');
-      this.spawnCommand('bundle', ['install']);
-    }
-
-    if (this.props.git) {
-      this.log('Setting up '+ chalk.yellow('Git') +' and immediately deploying...');
-      // TODO: yay async callback hell
-      this.spawnCommand('git', ['init']).on('close', function() {
-        this.spawnCommand('git', ['checkout', '-b', 'gh-pages']).on('close', function() {
-          this.spawnCommand('git', ['add', '-A']).on('close', function() {
-            this.spawnCommand('git', ['commit', '-m', '"Initial commit"']).on('close', function() {
-              this.spawnCommand('git', ['remote', 'add', 'origin', 'https://github.com/' + this.props.githubPages + '.git']).on('close', function() {
-                this.log('\nGit initialization '+ chalk.green('finished') +'.');
-
-                if (this.props.deploy) {
-                  this.log('Pushing branch to GitHub...');
-                  this.spawnCommand('git', ['push', '-u', 'origin', 'gh-pages']).on('close', function() {
-                    this.log('\nGit deployment '+ chalk.green('finished') +'. Refer to the errors to see if remote pushing was successful.');
-                    done();
-                  }.bind(this));
-                }
-                else {
-                  this.log('You can run '+ chalk.blue('git push -u origin gh-pages') +' when you\'re ready to push your code to GitHub and make it live.');
-                  done();
-                }
-              }.bind(this));
+    // Parallel async execution for bundler and git
+    async.parallel([
+      function(callback) {
+        // Skip bundle install with the option
+        if (!this.options.skipInstall) {
+          this.log('Running '+ chalk.yellow('bundle install') +'...');
+          this.spawnCommand('bundle', ['install'])
+            .on('error', function() {
+              this.log('');
+              this.log(chalk.red('Whoa') +', it doesn\'t seem like Bundle is working properly.');
+              this.log(chalk.blue('Have you installed Ruby and Bundler?'));
+              this.log('');
+            }.bind(this))
+            .on('close', function() {
+              callback(null, null);
             }.bind(this));
-          }.bind(this));
-        }.bind(this));
-      }.bind(this));
-    }
-    else {
+        }
+        else {
+          callback(null, null);
+        }
+      }.bind(this),
+      function(callback) {
+        if (this.props.git) {
+          this.log('Setting up '+ chalk.yellow('Git') +' and immediately deploying...');
+          var isError = false;
+          // TODO: yay async callback hell
+          this.spawnCommand('git', ['init']).on('close', function() {
+            if (!isError) {
+              this.spawnCommand('git', ['checkout', '-b', 'gh-pages']).on('close', function() {
+                this.spawnCommand('git', ['add', '-A']).on('close', function() {
+                  this.spawnCommand('git', ['commit', '-m', '"Initial commit"']).on('close', function() {
+                    this.spawnCommand('git', ['remote', 'add', 'origin', 'https://github.com/' + this.props.githubPages + '.git']).on('close', function() {
+                      this.log('\nGit initialization '+ chalk.green('finished') +'.');
+
+                      if (this.props.deploy) {
+                        this.log('Pushing branch to GitHub...');
+                        this.spawnCommand('git', ['push', '-u', 'origin', 'gh-pages']).on('close', function() {
+                          this.log('\nGit deployment '+ chalk.green('finished') +'. Refer to the errors to see if remote pushing was successful.');
+                          callback(null, null);
+                        }.bind(this));
+                      }
+                      else {
+                        this.log('You can run '+ chalk.blue('git push -u origin gh-pages') +' when you\'re ready to push your code to GitHub and make it live.');
+                        callback(null, null);
+                      }
+                    }.bind(this));
+                  }.bind(this));
+                }.bind(this));
+              }.bind(this));
+            }
+          }.bind(this))
+            .on('error', function() {
+              this.log('');
+              this.log(chalk.red('Whoa') +', it doesn\'t seem like Git is working properly.');
+              this.log(chalk.blue('Have you installed Git?'));
+              this.log('');
+              isError = true;
+              callback(null, null);
+            }.bind(this));
+        }
+        else {
+          callback(null, null);
+        }
+      }.bind(this)
+    ], function() {
       done();
-    }
+    });
   },
 
   end: function () {
