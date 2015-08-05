@@ -32,7 +32,6 @@ describe('project-journal:app', function() {
         '.editorconfig',
         '.gitignore',
         'Gemfile',
-        'Gemfile.lock',
         '.git'
       ]);
     });
@@ -109,7 +108,6 @@ describe('project-journal:app', function() {
         '.editorconfig',
         '.gitignore',
         'Gemfile',
-        'Gemfile.lock',
         '.git'
       ]);
     });
